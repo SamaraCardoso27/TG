@@ -1,0 +1,21 @@
+(dp1
+S'output'
+p2
+S'<class \'gluon.contrib.pysimplesoap.client.SoapFault\'> Server.OperationalError: unrecognized token: "\\"'
+p3
+sS'layer'
+p4
+S'/home/samara/Documentos/web2py/applications/TG/controllers/webservice.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf8 -*-\nfrom gluon.tools import Service\nfrom datetime import datetime\n\n\nservice = Service(globals())\n\n@service.soap(\'getKeyPointPerson\',returns={\'result\':str,\'code\':int},\n                            args={\'auth\':str,\'person_data\' : {\'full_name\':str, \'email\':str, \'cellphone\':str,\n                                                          \'birth_date\':str, \'city_person\':int, \'keypoints\': str}})\ndef getKeyPointPerson(auth,person_data):\n    person_data[\'birth_date\'] = datetime.strptime(person_data[\'birth_date\'], "%d/%m/%Y").strftime("%m-%d-%Y")\n    if auth == \'\' or auth == None or person_data == None or person_data == \'\':\n        return dict(result=\'NOT_VALID\',code=0)\n    else:\n        #ret = db.executesql("""SELECT company.id AS company_id, auth_user.id AS user_id\n                                #FROM auth_user, company\n                                #WHERE last_name=\'{0}\' AND \n                                #      auth_user.actived_user= \'T\' AND \n                                #      first_name=\'webservice\' LIMIT 1\n                               #""".format(auth),as_dict=True)\n        id_person = db.executesql("""INSERT INTO person (created, last_update, full_name, email, cellphone, birth_date, keypoints)\n                                        VALUES (\'{0}\', \'{0}\', \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\') RETURNING id;\n                                        """.format(datetime.now(),person_data[\'full_name\'],person_data[\'email\'],\n                                                   person_data[\'cellphone\'],person_data[\'birth_date\'],\n                                                   person_data[\'keypoints\']),as_dict=True)\n        return dict(result=\'OK\',code=id_person[0][\'id\'])\n    #return dict(result=\'NOT_VALID\',code=0)\n\ndef call():\n    return service()\n\ndef test_soap_sub():\n    from gluon.contrib.pysimplesoap.client import SoapClient, SoapFault\n    client = SoapClient(wsdl="http://127.0.0.1:8000/TG/webservice/call/soap?WSDL")   \n\n\n    response = client.getKeyPointPerson(auth=\'0DDEE29FAA57CF9DBEE480986E7B0686\',\n                                   person_data={\'full_name\':\'Samara Cardoso dos Santos\', \'email\':\'samara.cardoso@urbemobile.com.br\', \n                                                \'cellphone\':\'12988211378\', \'birth_date\':\'27/03/1994\',\n                                                \'keypoints\':"\'\\\\(580.9500732421875, 156.4681396484375\\\\)\'"})\n    try:\n        result = response\n    except SoapFault as e:\n        result = e\n    return dict(xml_request=client.xml_request, \n                xml_response=client.xml_response,\n                result=result)\nresponse._vars=response._caller(test_soap_sub)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+sS'traceback'
+p10
+S'Traceback (most recent call last):\n  File "/home/samara/Documentos/web2py/gluon/restricted.py", line 227, in restricted\n    exec ccode in environment\n  File "/home/samara/Documentos/web2py/applications/TG/controllers/webservice.py", line 49, in <module>\n  File "/home/samara/Documentos/web2py/gluon/globals.py", line 412, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/samara/Documentos/web2py/applications/TG/controllers/webservice.py", line 41, in test_soap_sub\n    \'keypoints\':"\'\\\\(580.9500732421875, 156.4681396484375\\\\)\'"})\n  File "/home/samara/Documentos/web2py/gluon/contrib/pysimplesoap/client.py", line 167, in <lambda>\n    return lambda *args, **kwargs: self.wsdl_call(attr, *args, **kwargs)\n  File "/home/samara/Documentos/web2py/gluon/contrib/pysimplesoap/client.py", line 322, in wsdl_call\n    response = self.call(method, *params)\n  File "/home/samara/Documentos/web2py/gluon/contrib/pysimplesoap/client.py", line 244, in call\n    raise SoapFault(unicode(response.faultcode), unicode(response.faultstring))\nSoapFault: Server.OperationalError: unrecognized token: "\\"\n'
+p11
+s.

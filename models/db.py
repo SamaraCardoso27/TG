@@ -11,6 +11,7 @@
 
 ## app configuration made easy. Look inside private/appconfig.ini
 from gluon.contrib.appconfig import AppConfig
+from datetime import datetime
 ## once in production, remove reload=True to gain full speed
 myconf = AppConfig(reload=True)
 
@@ -57,8 +58,6 @@ auth = Auth(db)
 service = Service()
 plugins = PluginManager()
 
-## create all tables needed by auth if not custom tables
-auth.define_tables(username=False, signature=False)
 
 ## configure email
 mail = auth.settings.mailer
@@ -90,3 +89,74 @@ auth.settings.reset_password_requires_verification = True
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
+
+db.define_table('country',
+    Field('name',requires=IS_NOT_EMPTY(),unique=True,length=128,label='Nome do Pais'),
+    format='%(name)s')
+
+
+db.define_table('province',
+    Field('name',requires=IS_NOT_EMPTY(),unique=True,length=128,label='Nome do Estado/Provincia'),
+    Field('country',db.country,writable=False,readable=True, label='Pais'),
+    format='%(name)s')
+
+db.province.country.requires = IS_IN_DB(db,'country.id', '%(name)s',
+                                          zero=T('Selecione'))
+
+
+db.define_table('city',
+    Field('created','datetime',writable=False,readable=False,label='Criado',default=datetime.now()),
+    Field('last_update','datetime',writable=False,readable=False,label='Última Atualização',default=datetime.now()),
+    Field('name',requires=IS_NOT_EMPTY(),length=50,label='Nome da Cidade'),
+    Field('province',db.province,writable=False,readable=True, label='Estado/Provincia'),
+    format='%(name)s')
+
+db.define_table('company',
+    Field('created','datetime',writable=False,readable=False,label='Criado',default=datetime.now()),
+    Field('last_update','datetime',writable=False,readable=False,label='Última Atualização',default=datetime.now()),
+    Field('name_cmp',length=256,requires=IS_NOT_EMPTY(),label='Nome'),
+    Field('cnpj',length=127,requires=IS_NOT_EMPTY(),label='CNPJ'),
+    Field('city_cmp',db.city,requires=IS_NOT_EMPTY(),notnull=True,label='Cidade'),
+    Field('address_cmp',length=300,label='Endereço'),
+    Field('address_number_cmp','integer',label='Número'),
+    Field('neigh_cmp',length=50,label='Bairro'),
+    Field('comp_cmp',length=50,label='Complemento'),
+    Field('zipcode_cmp',length=10,label='CEP'),
+    Field('deleted','boolean',writable=False,readable=False,label='Deleção Lógica',default='F'),
+    format='%(name_cmp)s')
+
+db.company.city_cmp.requires = IS_IN_DB(db,'city.id','%(name)s',zero=T('Selecione'))
+
+
+auth.settings.extra_fields['auth_user'] = [
+    Field('created','datetime',writable=False,readable=False,label='Criado',default=datetime.now()),
+    Field('last_update','datetime',writable=False,readable=False,label='Última Atualização',default=datetime.now()),
+    Field('email',length=100,label='E-mail'),
+    Field('cpf',length=50,label='CPF'),
+    Field('rg',length=50,label='RG'),
+    Field('birth',type='date',label='Data de Nascimento'),
+    Field('address',length=300,label='Endereço'),
+    Field('address_number','integer',label='Número'),
+    Field('comp_user',length=50,label='Complemento'),
+    Field('city_user',db.city,requires=IS_EMPTY_OR(IS_IN_DB(db, 'city.id', '%(id)s')),
+              represent=lambda id, row: db.city(id).name if id else '',label='Cidade'),
+    Field('neigh',length=50,label='Bairro'),
+    Field('zipcode',length=10,label='CEP'),
+    Field('company',db.company,requires=IS_EMPTY_OR(IS_IN_DB(db, 'company.id', '%(id)s')),
+              represent=lambda id, row: db.company(id).name_cmp if id else '',writable=False,readable=True, label='Empresa'),
+    Field('actived_user','boolean',label='Usuário ativo',default=True)
+    ]
+
+## create all tables needed by auth if not custom tables
+auth.define_tables(username=False, signature=False)
+
+
+db.define_table('person',
+    Field('created',type='datetime',writable=False,readable=False,label='Criado',default=datetime.now()),
+    Field('last_update',type='datetime',writable=False,readable=False,label='Última Atualização',default=datetime.now()),
+    Field('full_name',length=100,label='Nome Completo'),
+    Field('email',length=100,label='Email'),
+    Field('cellphone',length=15,label='Celular'),
+    Field('birth_date',type='date',label='Data de Nascimento'),
+    Field('keypoints',required=IS_NOT_EMPTY(),notnull=True,length=500,label='Keypoints'),
+    format='%(full_name)s')

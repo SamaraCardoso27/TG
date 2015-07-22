@@ -1,4 +1,42 @@
-timestamp: 2015-07-20T22:46:08.699374
+timestamp: 2015-07-21T23:19:10.550059
+CREATE TABLE country(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name CHAR(128) UNIQUE
+);
+success!
+timestamp: 2015-07-21T23:19:10.693945
+CREATE TABLE province(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name CHAR(128) UNIQUE,
+    country INTEGER REFERENCES country (id) ON DELETE CASCADE
+);
+success!
+timestamp: 2015-07-21T23:19:10.817733
+CREATE TABLE city(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    name CHAR(50),
+    province INTEGER REFERENCES province (id) ON DELETE CASCADE
+);
+success!
+timestamp: 2015-07-21T23:19:10.949352
+CREATE TABLE company(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    name_cmp CHAR(256),
+    cnpj CHAR(127),
+    city_cmp INTEGER REFERENCES city (id) ON DELETE CASCADE,
+    address_cmp CHAR(300),
+    address_number_cmp INTEGER,
+    neigh_cmp CHAR(50),
+    comp_cmp CHAR(50),
+    zipcode_cmp CHAR(10),
+    deleted CHAR(1)
+);
+success!
+timestamp: 2015-07-21T23:19:11.068231
 CREATE TABLE auth_user(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name CHAR(128),
@@ -7,24 +45,37 @@ CREATE TABLE auth_user(
     password CHAR(512),
     registration_key CHAR(512),
     reset_password_key CHAR(512),
-    registration_id CHAR(512)
+    registration_id CHAR(512),
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    cpf CHAR(50),
+    rg CHAR(50),
+    birth DATE,
+    address CHAR(300),
+    address_number INTEGER,
+    comp_user CHAR(50),
+    city_user INTEGER REFERENCES city (id) ON DELETE CASCADE,
+    neigh CHAR(50),
+    zipcode CHAR(10),
+    company INTEGER REFERENCES company (id) ON DELETE CASCADE,
+    actived_user CHAR(1)
 );
 success!
-timestamp: 2015-07-20T22:46:08.833290
+timestamp: 2015-07-21T23:19:11.188587
 CREATE TABLE auth_group(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     role CHAR(512),
     description TEXT
 );
 success!
-timestamp: 2015-07-20T22:46:08.978867
+timestamp: 2015-07-21T23:19:11.325651
 CREATE TABLE auth_membership(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
     group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE
 );
 success!
-timestamp: 2015-07-20T22:46:09.113026
+timestamp: 2015-07-21T23:19:11.465655
 CREATE TABLE auth_permission(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE,
@@ -33,7 +84,7 @@ CREATE TABLE auth_permission(
     record_id INTEGER
 );
 success!
-timestamp: 2015-07-20T22:46:09.270431
+timestamp: 2015-07-21T23:19:11.638472
 CREATE TABLE auth_event(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     time_stamp TIMESTAMP,
@@ -43,7 +94,7 @@ CREATE TABLE auth_event(
     description TEXT
 );
 success!
-timestamp: 2015-07-20T22:46:09.425916
+timestamp: 2015-07-21T23:19:11.778379
 CREATE TABLE auth_cas(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
@@ -51,5 +102,17 @@ CREATE TABLE auth_cas(
     service CHAR(512),
     ticket CHAR(512),
     renew CHAR(1)
+);
+success!
+timestamp: 2015-07-21T23:19:11.901512
+CREATE TABLE person(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    full_name CHAR(100),
+    email CHAR(100),
+    cellphone CHAR(15),
+    birth_date DATE,
+    keypoints CHAR(500) NOT NULL
 );
 success!
