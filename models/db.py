@@ -19,6 +19,7 @@ myconf = AppConfig(reload=True)
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
     db = DAL(myconf.take('db.uri'), pool_size=myconf.take('db.pool_size', cast=int), check_reserved=['all'])
+    db = DAL('postgres://postgres:q1w2E#R$@188.166.24.73/TG_Samara',pool_size=1,check_reserved=['all'])
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
     db = DAL('google:datastore+ndb')
@@ -154,9 +155,11 @@ auth.define_tables(username=False, signature=False)
 db.define_table('person',
     Field('created',type='datetime',writable=False,readable=False,label='Criado',default=datetime.now()),
     Field('last_update',type='datetime',writable=False,readable=False,label='Última Atualização',default=datetime.now()),
+    Field('last_user',db.auth_user,requires=IS_EMPTY_OR(IS_IN_DB(db, 'auth_user.id', '%(id)s')),
+                  represent=lambda id, row: db.auth_user(id).id if id else '',label='Usuario'),
     Field('full_name',length=100,label='Nome Completo'),
     Field('email',length=100,label='Email'),
     Field('cellphone',length=15,label='Celular'),
     Field('birth_date',type='date',label='Data de Nascimento'),
-    Field('keypoints',required=IS_NOT_EMPTY(),notnull=True,length=500,label='Keypoints'),
+    Field('keypoints',required=IS_NOT_EMPTY(),notnull=True,length=5000,label='Keypoints'),
     format='%(full_name)s')

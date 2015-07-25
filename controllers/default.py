@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # this file is released under public domain and you can use without limitations
+from samba.dcerpc.winreg import KeySecurityAttribute
 
 #########################################################################
 ## This is a sample controller
@@ -16,6 +17,8 @@ def index():
        response.flash = 'form has errors'
    else:
        response.flash = 'please fill out the form'
+
+   teste(Key)
    return dict(form=form)
 
 def user():
@@ -45,13 +48,7 @@ def download():
     return response.download(request, db)
 
 
-def call():
-    """
-    exposes services. for example:
-    http://..../[app]/default/call/jsonrpc
-    decorate with @services.jsonrpc the functions to expose
-    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
-    """
-    return service()
+
+
 
 

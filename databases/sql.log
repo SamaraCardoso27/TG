@@ -116,3 +116,132 @@ CREATE TABLE person(
     keypoints CHAR(500) NOT NULL
 );
 success!
+timestamp: 2015-07-24T21:51:09.697286
+CREATE TABLE country(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(128) UNIQUE
+);
+success!
+timestamp: 2015-07-24T21:51:10.188015
+CREATE TABLE province(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(128) UNIQUE,
+    country INTEGER REFERENCES country (id) ON DELETE CASCADE
+);
+success!
+timestamp: 2015-07-24T21:51:10.860175
+CREATE TABLE city(
+    id SERIAL PRIMARY KEY,
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    name VARCHAR(50),
+    province INTEGER REFERENCES province (id) ON DELETE CASCADE
+);
+success!
+timestamp: 2015-07-24T21:51:11.537958
+CREATE TABLE company(
+    id SERIAL PRIMARY KEY,
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    name_cmp VARCHAR(256),
+    cnpj VARCHAR(127),
+    city_cmp INTEGER REFERENCES city (id) ON DELETE CASCADE,
+    address_cmp VARCHAR(300),
+    address_number_cmp INTEGER,
+    neigh_cmp VARCHAR(50),
+    comp_cmp VARCHAR(50),
+    zipcode_cmp VARCHAR(10),
+    deleted CHAR(1)
+);
+success!
+timestamp: 2015-07-24T21:51:12.221151
+CREATE TABLE auth_user(
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    email VARCHAR(512),
+    password VARCHAR(512),
+    registration_key VARCHAR(512),
+    reset_password_key VARCHAR(512),
+    registration_id VARCHAR(512),
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    cpf VARCHAR(50),
+    rg VARCHAR(50),
+    birth DATE,
+    address VARCHAR(300),
+    address_number INTEGER,
+    comp_user VARCHAR(50),
+    city_user INTEGER REFERENCES city (id) ON DELETE CASCADE,
+    neigh VARCHAR(50),
+    zipcode VARCHAR(10),
+    company INTEGER REFERENCES company (id) ON DELETE CASCADE,
+    actived_user CHAR(1)
+);
+success!
+timestamp: 2015-07-24T21:51:12.907320
+CREATE TABLE auth_group(
+    id SERIAL PRIMARY KEY,
+    role VARCHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2015-07-24T21:51:13.612997
+CREATE TABLE auth_membership(
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE
+);
+success!
+timestamp: 2015-07-24T21:51:14.278564
+CREATE TABLE auth_permission(
+    id SERIAL PRIMARY KEY,
+    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE,
+    name VARCHAR(512),
+    table_name VARCHAR(512),
+    record_id INTEGER
+);
+success!
+timestamp: 2015-07-24T21:51:14.951380
+CREATE TABLE auth_event(
+    id SERIAL PRIMARY KEY,
+    time_stamp TIMESTAMP,
+    client_ip VARCHAR(512),
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    origin VARCHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2015-07-24T21:51:15.631705
+CREATE TABLE auth_cas(
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    created_on TIMESTAMP,
+    service VARCHAR(512),
+    ticket VARCHAR(512),
+    renew CHAR(1)
+);
+success!
+timestamp: 2015-07-24T21:51:16.314310
+CREATE TABLE person(
+    id SERIAL PRIMARY KEY,
+    created TIMESTAMP,
+    last_update TIMESTAMP,
+    full_name VARCHAR(100),
+    email VARCHAR(100),
+    cellphone VARCHAR(15),
+    birth_date DATE,
+    keypoints VARCHAR(500) NOT NULL
+);
+success!
+timestamp: 2015-07-24T21:53:20.022602
+ALTER TABLE person ADD keypoints__tmp VARCHAR(5000) NOT NULL;
+UPDATE person SET keypoints__tmp=keypoints;
+ALTER TABLE person DROP COLUMN keypoints;
+ALTER TABLE person ADD keypoints VARCHAR(5000) NOT NULL;
+UPDATE person SET keypoints=keypoints__tmp;
+ALTER TABLE person DROP COLUMN keypoints__tmp;
+success!
+timestamp: 2015-07-24T22:17:00.395877
+ALTER TABLE person ADD last_user INTEGER REFERENCES auth_user (id) ON DELETE CASCADE;
+success!
