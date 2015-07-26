@@ -1,2 +1,35 @@
 {{extend 'layout.html'}}
-{{=form}}
+
+<meta charset="utf-8" />
+<script type='text/javascript' src="{{=URL('static','js/insert_person.js')}}"></script>
+
+<div class="container">
+	<div class="col-md-10">
+		<form method="POST" class="form_add" action="{{=URL('insert_person',args=['submit'])}}" id="submit_form">
+			<div class="form-group">
+			  <label>Nome</label>
+			  <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Nome">
+			</div>
+			<div class="form-group">
+				<label>email</label>
+				<input type="email" class="form-control" id="email" name="email" placeholder="email">
+			</div>
+			<div class="form-group">
+				<label>Celular</label>
+				<input type="text" class="form-control" id="cellphone" name="cellphone" placeholder="Celular">
+			</div>
+			<div class="form-group">
+				<label>Data de Nascimento</label>
+				<input type="text" class="form-control" id="birth_date" name="birth_date" placeholder="Data de Nascimento">
+			</div>
+			<div class="form-group">
+			  <label>Keypoints</label>
+			  <input type="text" class="form-control" id="keypoints" name="keypoints" value="{{=key}}"/>
+			</div>
+    	    <input type="button" class="btn btn-primary" value="Cadastar" id="insert" 
+	         onclick="submit_insert_person()">
+		</form>
+	</div>
+</div>
+
+
